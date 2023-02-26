@@ -1,3 +1,3 @@
-# mba-cod-disciplina-turma-grupo-numero
+# mba-full-05-grupo-03
 
-Grupo número da disciplina de XXX - Bootcamp
+Grupo 03 da disciplina de Full Digital Project - Bootcamp
