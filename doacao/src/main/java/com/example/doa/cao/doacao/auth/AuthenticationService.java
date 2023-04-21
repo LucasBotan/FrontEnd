@@ -48,7 +48,7 @@ public class AuthenticationService {
                 .gender(request.getGender())
                 .phone(request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Objects.isNull(request.getRole()) || !request.getRole().equals(Role.ADMIN.name()) ? Role.ADMIN : Role.USER)
+                .role(Objects.isNull(request.getRole()) || !request.getRole().equals(Role.ADMIN.name()) ? Role.USER: Role.ADMIN)
                 .build();
 
         var savedUser = repository.save(user);
@@ -63,6 +63,7 @@ public class AuthenticationService {
                 .phone(savedUser.getPhone())
                 .birth(request.getBirth())
                 .gender(savedUser.getGender())
+                .role(savedUser.getRole().name())
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
