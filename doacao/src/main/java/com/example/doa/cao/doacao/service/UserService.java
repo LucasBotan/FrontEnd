@@ -1,5 +1,6 @@
 package com.example.doa.cao.doacao.service;
 
+import com.example.doa.cao.doacao.exception.AuthenticationException;
 import com.example.doa.cao.doacao.models.ERole;
 import com.example.doa.cao.doacao.models.Role;
 import com.example.doa.cao.doacao.models.User;
@@ -13,6 +14,8 @@ import com.example.doa.cao.doacao.security.jwt.JwtUtils;
 import com.example.doa.cao.doacao.security.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,19 +33,25 @@ import java.util.stream.Collectors;
 public class UserService {
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
-    PasswordEncoder encoder;
+    private PasswordEncoder encoder;
 
     @Autowired
-    JwtUtils jwtUtils;
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private SecurityService securityService;
+
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     public RegisterResponse register(RegisterRequest signUpRequest) {
 
@@ -83,8 +93,11 @@ public class UserService {
         }
 
         user.setRoles(roles);
-        userRepository.save(user);
 
+        userRepository.save(user);
+       var refreshToken =  refreshTokenService.createRefreshToken(user.getId());
+
+//        securityService.autologin(user.getEmail(), user.getPassword());
         return RegisterResponse
                 .builder()
                 .id(user.getId())
@@ -93,11 +106,14 @@ public class UserService {
                 .phone(user.getPhone())
                 .birth(user.getBirth())
                 .gender(user.getGender())
+                .role(user.getRoles().stream().map(Role::getName).map(Enum::name).collect(Collectors.toSet()))
+                .refreshToken(refreshToken.getToken())
                 .build();
 
     }
 
     public AuthenticateResponse authenticate(LoginRequest loginRequest) {
+        authenticate(loginRequest.getEmail(), loginRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -106,7 +122,7 @@ public class UserService {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
 
-        User user = userRepository.findById(userDetails.getId()).orElseThrow();
+        var user = userRepository.findById(userDetails.getId()).orElseThrow();
 
         return AuthenticateResponse
                 .builder()
@@ -117,8 +133,20 @@ public class UserService {
                 .birth(user.getBirth())
                 .gender(user.getGender())
                 .roles(roles)
-                .type("Bearer")
                 .token(jwt)
                 .build();
+    }
+
+    private void authenticate(String username, String password) {
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(password);
+
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (DisabledException e) {
+            throw new AuthenticationException("Parece que o usuário está desativado", e);
+        } catch (BadCredentialsException e) {
+            throw new AuthenticationException("Usuário ou senha parecem inválidos", e);
+        }
     }
 }

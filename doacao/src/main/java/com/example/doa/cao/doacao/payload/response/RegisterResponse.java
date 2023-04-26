@@ -1,29 +1,42 @@
 package com.example.doa.cao.doacao.payload.response;
 
+import com.example.doa.cao.doacao.models.ERole;
+import com.example.doa.cao.doacao.models.Role;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Data;
 
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Set;
+
 @Data
 @Builder
+@JsonPropertyOrder(value = {"user_id", "name", "email", "tel", "sexo", "nasc", "role"})
 public class RegisterResponse {
 
     @JsonProperty("user_id")
     private Long id;
 
-    @JsonProperty("user_name")
+    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("user_email")
+    @JsonProperty("email")
     private String email;
 
-    @JsonProperty("user_phone")
+    @JsonProperty("tel")
     private String phone;
 
-    @JsonProperty("user_gender")
-    private String gender;
+    @JsonProperty("sexo")
+    private Character gender;
 
-    @JsonProperty("user_birth")
-    private String birth;
+    @JsonProperty(value = "nasc")
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private Timestamp birth;
 
+    private Set<String> role;
+
+    private String refreshToken;
 }

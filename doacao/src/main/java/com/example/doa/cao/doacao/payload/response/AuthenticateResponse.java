@@ -1,39 +1,46 @@
 package com.example.doa.cao.doacao.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonPropertyOrder(value = {"user_id", "name", "email", "tel", "sexo", "nasc", "role"})
 public class AuthenticateResponse {
 
     @JsonProperty("user_id")
     private Long id;
 
-    @JsonProperty("user_name")
+    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("user_email")
+    @JsonProperty("email")
     private String email;
 
-    @JsonProperty("user_phone")
+    @JsonProperty("tel")
     private String phone;
 
-    @JsonProperty("user_gender")
-    private String gender;
+    @JsonProperty("sexo")
+    private Character gender;
 
-    @JsonProperty("user_birth")
-    private String birth;
+    @JsonProperty("nasc")
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private Timestamp birth;
 
-    private String type = "Bearer";
     private String token;
+
+
 
     private List<String> roles;
 

@@ -1,7 +1,9 @@
 package com.example.doa.cao.doacao.models;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,10 +31,11 @@ public class User {
     private String phone;
 
     @Column(name = "USER_GENDER")
-    private String gender;
+    private Character gender;
 
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     @Column(name = "USER_BIRTH")
-    private String birth;
+    private Timestamp birth;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",

@@ -1,11 +1,14 @@
 package com.example.doa.cao.doacao.payload.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.sql.Timestamp;
 import java.util.Set;
 
 @Data
@@ -13,21 +16,28 @@ import java.util.Set;
 @AllArgsConstructor
 public class RegisterRequest {
 
+    @JsonProperty("name")
     @NotEmpty(message = "Ops... Parece que você esqueceu do nome!")
     private String name;
 
-    @NotEmpty(message = "Ops... Parece que você esqueceu o Email!")
+    @JsonProperty("email")
     @Email(message = "Ops... Este não parece um Email válido!")
+    @NotEmpty(message = "Ops... Parece que você esqueceu o Email!")
     private String email;
 
+    @JsonProperty("password")
     @NotEmpty(message = "Ops... Não esqueça de informar uma senha!")
     private String password;
 
+    @JsonProperty("tel")
     private String phone;
 
-    private String gender;
+    @JsonProperty("sexo")
+    private Character gender;
 
-    private String birth;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    @JsonProperty("nasc")
+    private Timestamp birth;
 
     private Set<String> role;
 
