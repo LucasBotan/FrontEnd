@@ -12,6 +12,7 @@ import com.example.doa.cao.doacao.repository.UserRepository;
 import com.example.doa.cao.doacao.security.jwt.JwtUtils;
 import com.example.doa.cao.doacao.service.RefreshTokenService;
 import com.example.doa.cao.doacao.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,16 +26,13 @@ import javax.validation.Valid;
 public class AuthController {
 
     @Autowired
-    UserService service;
-
+    private UserService service;
     @Autowired
-    UserRepository userRepository;
-
+    private UserRepository userRepository;
     @Autowired
-    JwtUtils jwtUtils;
-
+    private JwtUtils jwtUtils;
     @Autowired
-    RefreshTokenService refreshTokenService;
+    private RefreshTokenService refreshTokenService;
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
